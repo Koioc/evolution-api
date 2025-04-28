@@ -5,25 +5,29 @@ export class Quoted {
   message: proto.IMessage;
 }
 
+export class Mentions {
+  everyOne: boolean;
+  mentioned: string[];
+}
+
 export class Options {
   delay?: number;
   presence?: WAPresence;
   quoted?: Quoted;
+  mentions?: Mentions;
   linkPreview?: boolean;
   encoding?: boolean;
-  mentionsEveryOne?: boolean;
-  mentioned?: string[];
-  webhookUrl?: string;
+}
+class OptionsMessage {
+  options: Options;
 }
 
-export class MediaMessage {
-  mediatype: MediaType;
-  mimetype?: string;
-  caption?: string;
-  // for document
-  fileName?: string;
-  // url or base64
-  media: string;
+export class Metadata extends OptionsMessage {
+  number: string;
+}
+
+class TextMessage {
+  text: string;
 }
 
 export class StatusMessage {
@@ -36,43 +40,30 @@ export class StatusMessage {
   font?: number;
 }
 
-export class Metadata {
-  number: string;
-  delay?: number;
-  quoted?: Quoted;
-  linkPreview?: boolean;
-  mentionsEveryOne?: boolean;
-  mentioned?: string[];
-  encoding?: boolean;
-}
-
-export class SendTextDto extends Metadata {
-  text: string;
-}
-export class SendPresence extends Metadata {
-  text: string;
-}
-
-export class SendStatusDto extends Metadata {
-  type: string;
-  content: string;
-  statusJidList?: string[];
-  allContacts?: boolean;
-  caption?: string;
-  backgroundColor?: string;
-  font?: number;
-}
-
-export class SendPollDto extends Metadata {
+class PollMessage {
   name: string;
   selectableCount: number;
   values: string[];
   messageSecret?: Uint8Array;
 }
 
-export type MediaType = 'image' | 'document' | 'video' | 'audio' | 'ptv';
+export class SendTextDto extends Metadata {
+  textMessage: TextMessage;
+}
+export class SendPresence extends Metadata {
+  textMessage: TextMessage;
+}
 
-export class SendMediaDto extends Metadata {
+export class SendStatusDto extends Metadata {
+  statusMessage: StatusMessage;
+}
+
+export class SendPollDto extends Metadata {
+  pollMessage: PollMessage;
+}
+
+export type MediaType = 'image' | 'document' | 'video' | 'audio';
+export class MediaMessage {
   mediatype: MediaType;
   mimetype?: string;
   caption?: string;
@@ -81,49 +72,46 @@ export class SendMediaDto extends Metadata {
   // url or base64
   media: string;
 }
-
-export class SendPtvDto extends Metadata {
-  video: string;
+export class SendMediaDto extends Metadata {
+  mediaMessage: MediaMessage;
 }
-
+class Sticker {
+  image: string;
+}
 export class SendStickerDto extends Metadata {
-  sticker: string;
+  stickerMessage: Sticker;
 }
 
-export class SendAudioDto extends Metadata {
+class Audio {
   audio: string;
 }
-
-export type TypeButton = 'reply' | 'copy' | 'url' | 'call' | 'pix';
-
-export type KeyType = 'phone' | 'email' | 'cpf' | 'cnpj' | 'random';
-
-export class Button {
-  type: TypeButton;
-  displayText?: string;
-  id?: string;
-  url?: string;
-  copyCode?: string;
-  phoneNumber?: string;
-  currency?: string;
-  name?: string;
-  keyType?: KeyType;
-  key?: string;
+export class SendAudioDto extends Metadata {
+  audioMessage: Audio;
 }
 
-export class SendButtonsDto extends Metadata {
-  thumbnailUrl?: string;
+class Button {
+  buttonText: string;
+  buttonId: string;
+}
+class ButtonMessage {
   title: string;
-  description?: string;
-  footer?: string;
+  description: string;
+  footerText?: string;
   buttons: Button[];
+  mediaMessage?: MediaMessage;
+}
+export class SendButtonDto extends Metadata {
+  buttonMessage: ButtonMessage;
 }
 
-export class SendLocationDto extends Metadata {
+class LocationMessage {
   latitude: number;
   longitude: number;
   name?: string;
   address?: string;
+}
+export class SendLocationDto extends Metadata {
+  locationMessage: LocationMessage;
 }
 
 class Row {
@@ -135,12 +123,15 @@ class Section {
   title: string;
   rows: Row[];
 }
-export class SendListDto extends Metadata {
+class ListMessage {
   title: string;
-  description?: string;
+  description: string;
   footerText?: string;
   buttonText: string;
   sections: Section[];
+}
+export class SendListDto extends Metadata {
+  listMessage: ListMessage;
 }
 
 export class ContactMessage {
@@ -152,17 +143,23 @@ export class ContactMessage {
   url?: string;
 }
 
-export class SendTemplateDto extends Metadata {
+export class TemplateMessage {
   name: string;
   language: string;
   components: any;
-  webhookUrl?: string;
-}
-export class SendContactDto extends Metadata {
-  contact: ContactMessage[];
 }
 
-export class SendReactionDto {
+export class SendTemplateDto extends Metadata {
+  templateMessage: TemplateMessage;
+}
+export class SendContactDto extends Metadata {
+  contactMessage: ContactMessage[];
+}
+
+class ReactionMessage {
   key: proto.IMessageKey;
   reaction: string;
+}
+export class SendReactionDto {
+  reactionMessage: ReactionMessage;
 }

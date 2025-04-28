@@ -1,7 +1,8 @@
-import { ConfigService, Database } from '@config/env.config';
-import { ROOT_DIR } from '@config/path.config';
 import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
+
+import { ConfigService, Database } from '../../config/env.config';
+import { ROOT_DIR } from '../../config/path.config';
 
 export type IInsert = { insertCount: number };
 

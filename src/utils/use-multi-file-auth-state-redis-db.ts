@@ -1,6 +1,7 @@
-import { CacheService } from '@api/services/cache.service';
-import { Logger } from '@config/logger.config';
 import { AuthenticationCreds, AuthenticationState, initAuthCreds, proto, SignalDataTypeMap } from 'baileys';
+
+import { CacheService } from '../api/services/cache.service';
+import { Logger } from '../config/logger.config';
 
 export async function useMultiFileAuthStateRedisDb(
   instanceName: string,
@@ -9,7 +10,7 @@ export async function useMultiFileAuthStateRedisDb(
   state: AuthenticationState;
   saveCreds: () => Promise<void>;
 }> {
-  const logger = new Logger('useMultiFileAuthStateRedisDb');
+  const logger = new Logger(useMultiFileAuthStateRedisDb.name);
 
   const writeData = async (data: any, key: string): Promise<any> => {
     try {

@@ -1,11 +1,22 @@
-import { InstanceDto } from '@api/dto/instance.dto';
-import { cache, prismaRepository, waMonitor } from '@api/server.module';
-import { CacheConf, configService } from '@config/env.config';
-import { BadRequestException, ForbiddenException, InternalServerErrorException, NotFoundException } from '@exceptions';
 import { NextFunction, Request, Response } from 'express';
+import { existsSync } from 'fs';
+import { join } from 'path';
+
+import { CacheConf, configService, Database } from '../../config/env.config';
+import { INSTANCE_DIR } from '../../config/path.config';
+import {
+  BadRequestException,
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '../../exceptions';
+import { dbserver } from '../../libs/db.connect';
+import { InstanceDto } from '../dto/instance.dto';
+import { cache, waMonitor } from '../server.module';
 
 async function getInstance(instanceName: string) {
   try {
+    const db = configService.get<Database>('DATABASE');
     const cacheConf = configService.get<CacheConf>('CACHE');
 
     const exists = !!waMonitor.waInstances[instanceName];
@@ -16,7 +27,15 @@ async function getInstance(instanceName: string) {
       return exists || keyExists;
     }
 
-    return exists || (await prismaRepository.instance.findMany({ where: { name: instanceName } })).length > 0;
+    if (db.ENABLED) {
+      const collection = dbserver
+        .getClient()
+        .db(db.CONNECTION.DB_PREFIX_NAME + '-instances')
+        .collection(instanceName);
+      return exists || (await collection.find({}).toArray()).length > 0;
+    }
+
+    return exists || existsSync(join(INSTANCE_DIR, instanceName));
   } catch (error) {
     throw new InternalServerErrorException(error?.toString());
   }
@@ -47,6 +66,7 @@ export async function instanceLoggedGuard(req: Request, _: Response, next: NextF
     }
 
     if (waMonitor.waInstances[instance.instanceName]) {
+      waMonitor.waInstances[instance.instanceName]?.removeRabbitmqQueues();
       delete waMonitor.waInstances[instance.instanceName];
     }
   }

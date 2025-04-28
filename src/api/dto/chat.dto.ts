@@ -1,11 +1,4 @@
-import {
-  proto,
-  WAPresence,
-  WAPrivacyGroupAddValue,
-  WAPrivacyOnlineValue,
-  WAPrivacyValue,
-  WAReadReceiptsValue,
-} from 'baileys';
+import { proto, WAPresence, WAPrivacyOnlineValue, WAPrivacyValue, WAReadReceiptsValue } from 'baileys';
 
 export class OnWhatsAppDto {
   constructor(
@@ -66,7 +59,7 @@ class Key {
   remoteJid: string;
 }
 export class ReadMessageDto {
-  readMessages: Key[];
+  read_messages: Key[];
 }
 
 export class LastMessage {
@@ -85,13 +78,17 @@ export class MarkChatUnreadDto {
   chat?: string;
 }
 
-export class PrivacySettingDto {
+class PrivacySetting {
   readreceipts: WAReadReceiptsValue;
   profile: WAPrivacyValue;
   status: WAPrivacyValue;
   online: WAPrivacyOnlineValue;
   last: WAPrivacyValue;
-  groupadd: WAPrivacyGroupAddValue;
+  groupadd: any;
+}
+
+export class PrivacySettingDto {
+  privacySettings: PrivacySetting;
 }
 
 export class DeleteMessage {
@@ -112,8 +109,10 @@ export class Metadata extends OptionsMessage {
 }
 
 export class SendPresenceDto extends Metadata {
-  presence: WAPresence;
-  delay: number;
+  options: {
+    presence: WAPresence;
+    delay: number;
+  };
 }
 
 export class UpdateMessageDto extends Metadata {

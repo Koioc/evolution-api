@@ -1,7 +1,7 @@
 export class LabelDto {
   id?: string;
   name: string;
-  color: string;
+  color: number;
   predefinedId?: string;
 }
 

@@ -1,9 +1,10 @@
-import { ICache } from '@api/abstract/abstract.cache';
-import { Logger } from '@config/logger.config';
 import { BufferJSON } from 'baileys';
 
+import { Logger } from '../../config/logger.config';
+import { ICache } from '../abstract/abstract.cache';
+
 export class CacheService {
-  private readonly logger = new Logger('CacheService');
+  private readonly logger = new Logger(CacheService.name);
 
   constructor(private readonly cache: ICache) {
     if (cache) {
@@ -17,13 +18,11 @@ export class CacheService {
     if (!this.cache) {
       return;
     }
+    this.logger.verbose(`cacheservice getting key: ${key}`);
     return this.cache.get(key);
   }
 
   public async hGet(key: string, field: string) {
-    if (!this.cache) {
-      return null;
-    }
     try {
       const data = await this.cache.hGet(key, field);
 
@@ -38,17 +37,15 @@ export class CacheService {
     }
   }
 
-  async set(key: string, value: any, ttl?: number) {
+  async set(key: string, value: any) {
     if (!this.cache) {
       return;
     }
-    this.cache.set(key, value, ttl);
+    this.logger.verbose(`cacheservice setting key: ${key}`);
+    this.cache.set(key, value);
   }
 
   public async hSet(key: string, field: string, value: any) {
-    if (!this.cache) {
-      return;
-    }
     try {
       const json = JSON.stringify(value, BufferJSON.replacer);
 
@@ -62,6 +59,7 @@ export class CacheService {
     if (!this.cache) {
       return;
     }
+    this.logger.verbose(`cacheservice has key: ${key}`);
     return this.cache.has(key);
   }
 
@@ -69,13 +67,11 @@ export class CacheService {
     if (!this.cache) {
       return;
     }
+    this.logger.verbose(`cacheservice deleting key: ${key}`);
     return this.cache.delete(key);
   }
 
   async hDelete(key: string, field: string) {
-    if (!this.cache) {
-      return false;
-    }
     try {
       await this.cache.hDelete(key, field);
       return true;
@@ -89,6 +85,7 @@ export class CacheService {
     if (!this.cache) {
       return;
     }
+    this.logger.verbose(`cacheservice deleting all keys`);
     return this.cache.deleteAll(appendCriteria);
   }
 
@@ -96,6 +93,7 @@ export class CacheService {
     if (!this.cache) {
       return;
     }
+    this.logger.verbose(`cacheservice getting all keys`);
     return this.cache.keys(appendCriteria);
   }
 }

@@ -1,57 +1,51 @@
-import { RouterBroker } from '@api/abstract/abstract.router';
-import {
-  SendAudioDto,
-  SendButtonsDto,
-  SendContactDto,
-  SendListDto,
-  SendLocationDto,
-  SendMediaDto,
-  SendPollDto,
-  SendPtvDto,
-  SendReactionDto,
-  SendStatusDto,
-  SendStickerDto,
-  SendTemplateDto,
-  SendTextDto,
-} from '@api/dto/sendMessage.dto';
-import { sendMessageController } from '@api/server.module';
+import { RequestHandler, Router } from 'express';
+
+import { Logger } from '../../config/logger.config';
 import {
   audioMessageSchema,
-  buttonsMessageSchema,
+  buttonMessageSchema,
   contactMessageSchema,
   listMessageSchema,
   locationMessageSchema,
   mediaMessageSchema,
   pollMessageSchema,
-  ptvMessageSchema,
   reactionMessageSchema,
   statusMessageSchema,
   stickerMessageSchema,
   templateMessageSchema,
   textMessageSchema,
-} from '@validate/validate.schema';
-import { RequestHandler, Router } from 'express';
-import multer from 'multer';
-
+} from '../../validate/validate.schema';
+import { RouterBroker } from '../abstract/abstract.router';
+import {
+  SendAudioDto,
+  SendButtonDto,
+  SendContactDto,
+  SendListDto,
+  SendLocationDto,
+  SendMediaDto,
+  SendPollDto,
+  SendReactionDto,
+  SendStatusDto,
+  SendStickerDto,
+  SendTemplateDto,
+  SendTextDto,
+} from '../dto/sendMessage.dto';
+import { sendMessageController } from '../server.module';
 import { HttpStatus } from './index.router';
 
-const upload = multer({ storage: multer.memoryStorage() });
+const logger = new Logger('MessageRouter');
 
 export class MessageRouter extends RouterBroker {
   constructor(...guards: RequestHandler[]) {
     super();
     this.router
-      .post(this.routerPath('sendTemplate'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<SendTemplateDto>({
-          request: req,
-          schema: templateMessageSchema,
-          ClassRef: SendTemplateDto,
-          execute: (instance, data) => sendMessageController.sendTemplate(instance, data),
-        });
-
-        return res.status(HttpStatus.CREATED).json(response);
-      })
       .post(this.routerPath('sendText'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendText');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendTextDto>({
           request: req,
           schema: textMessageSchema,
@@ -61,68 +55,77 @@ export class MessageRouter extends RouterBroker {
 
         return res.status(HttpStatus.CREATED).json(response);
       })
-      .post(this.routerPath('sendMedia'), ...guards, upload.single('file'), async (req, res) => {
-        const bodyData = req.body;
+      .post(this.routerPath('sendMedia'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendMedia');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
 
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendMediaDto>({
           request: req,
           schema: mediaMessageSchema,
           ClassRef: SendMediaDto,
-          execute: (instance) => sendMessageController.sendMedia(instance, bodyData, req.file as any),
+          execute: (instance, data) => sendMessageController.sendMedia(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);
       })
-      .post(this.routerPath('sendPtv'), ...guards, upload.single('file'), async (req, res) => {
-        const bodyData = req.body;
+      .post(this.routerPath('sendWhatsAppAudio'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendWhatsAppAudio');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
 
-        const response = await this.dataValidate<SendPtvDto>({
-          request: req,
-          schema: ptvMessageSchema,
-          ClassRef: SendPtvDto,
-          execute: (instance) => sendMessageController.sendPtv(instance, bodyData, req.file as any),
-        });
-
-        return res.status(HttpStatus.CREATED).json(response);
-      })
-      .post(this.routerPath('sendWhatsAppAudio'), ...guards, upload.single('file'), async (req, res) => {
-        const bodyData = req.body;
-
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendAudioDto>({
           request: req,
           schema: audioMessageSchema,
           ClassRef: SendMediaDto,
-          execute: (instance) => sendMessageController.sendWhatsAppAudio(instance, bodyData, req.file as any),
+          execute: (instance, data) => sendMessageController.sendWhatsAppAudio(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);
       })
-      // TODO: Revisar funcionamento do envio de Status
-      .post(this.routerPath('sendStatus'), ...guards, upload.single('file'), async (req, res) => {
-        const bodyData = req.body;
+      .post(this.routerPath('sendTemplate'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendTemplate');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
 
-        const response = await this.dataValidate<SendStatusDto>({
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
+        const response = await this.dataValidate<SendTemplateDto>({
           request: req,
-          schema: statusMessageSchema,
-          ClassRef: SendStatusDto,
-          execute: (instance) => sendMessageController.sendStatus(instance, bodyData, req.file as any),
+          schema: templateMessageSchema,
+          ClassRef: SendTemplateDto,
+          execute: (instance, data) => sendMessageController.sendTemplate(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);
       })
-      .post(this.routerPath('sendSticker'), ...guards, upload.single('file'), async (req, res) => {
-        const bodyData = req.body;
+      .post(this.routerPath('sendButtons'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendButtons');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
 
-        const response = await this.dataValidate<SendStickerDto>({
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
+        const response = await this.dataValidate<SendButtonDto>({
           request: req,
-          schema: stickerMessageSchema,
-          ClassRef: SendStickerDto,
-          execute: (instance) => sendMessageController.sendSticker(instance, bodyData, req.file as any),
+          schema: buttonMessageSchema,
+          ClassRef: SendButtonDto,
+          execute: (instance, data) => sendMessageController.sendButtons(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);
       })
       .post(this.routerPath('sendLocation'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendLocation');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendLocationDto>({
           request: req,
           schema: locationMessageSchema,
@@ -132,7 +135,29 @@ export class MessageRouter extends RouterBroker {
 
         return res.status(HttpStatus.CREATED).json(response);
       })
+      .post(this.routerPath('sendList'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendList');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
+        const response = await this.dataValidate<SendListDto>({
+          request: req,
+          schema: listMessageSchema,
+          ClassRef: SendListDto,
+          execute: (instance, data) => sendMessageController.sendList(instance, data),
+        });
+
+        return res.status(HttpStatus.CREATED).json(response);
+      })
       .post(this.routerPath('sendContact'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendContact');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendContactDto>({
           request: req,
           schema: contactMessageSchema,
@@ -143,6 +168,12 @@ export class MessageRouter extends RouterBroker {
         return res.status(HttpStatus.CREATED).json(response);
       })
       .post(this.routerPath('sendReaction'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendReaction');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendReactionDto>({
           request: req,
           schema: reactionMessageSchema,
@@ -153,6 +184,12 @@ export class MessageRouter extends RouterBroker {
         return res.status(HttpStatus.CREATED).json(response);
       })
       .post(this.routerPath('sendPoll'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendPoll');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
         const response = await this.dataValidate<SendPollDto>({
           request: req,
           schema: pollMessageSchema,
@@ -162,27 +199,39 @@ export class MessageRouter extends RouterBroker {
 
         return res.status(HttpStatus.CREATED).json(response);
       })
-      .post(this.routerPath('sendList'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<SendListDto>({
+      .post(this.routerPath('sendStatus'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendStatus');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
+        const response = await this.dataValidate<SendStatusDto>({
           request: req,
-          schema: listMessageSchema,
-          ClassRef: SendListDto,
-          execute: (instance, data) => sendMessageController.sendList(instance, data),
+          schema: statusMessageSchema,
+          ClassRef: SendStatusDto,
+          execute: (instance, data) => sendMessageController.sendStatus(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);
       })
-      .post(this.routerPath('sendButtons'), ...guards, async (req, res) => {
-        const response = await this.dataValidate<SendButtonsDto>({
+      .post(this.routerPath('sendSticker'), ...guards, async (req, res) => {
+        logger.verbose('request received in sendSticker');
+        logger.verbose('request body: ');
+        logger.verbose(req.body);
+
+        logger.verbose('request query: ');
+        logger.verbose(req.query);
+        const response = await this.dataValidate<SendStickerDto>({
           request: req,
-          schema: buttonsMessageSchema,
-          ClassRef: SendButtonsDto,
-          execute: (instance, data) => sendMessageController.sendButtons(instance, data),
+          schema: stickerMessageSchema,
+          ClassRef: SendStickerDto,
+          execute: (instance, data) => sendMessageController.sendSticker(instance, data),
         });
 
         return res.status(HttpStatus.CREATED).json(response);
       });
   }
 
-  public readonly router: Router = Router();
+  public readonly router = Router();
 }

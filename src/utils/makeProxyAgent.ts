@@ -1,14 +1,8 @@
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
-type Proxy = {
-  host: string;
-  password?: string;
-  port: string;
-  protocol: string;
-  username?: string;
-};
+import { wa } from '../api/types/wa.types';
 
-export function makeProxyAgent(proxy: Proxy | string) {
+export function makeProxyAgent(proxy: wa.Proxy | string) {
   if (typeof proxy === 'string') {
     return new HttpsProxyAgent(proxy);
   }

@@ -34,17 +34,18 @@
  * └──────────────────────────────────────────────────────────────────────────────┘
  */
 
-import { ProviderFiles } from '@api/provider/sessions';
-import { Logger } from '@config/logger.config';
 import { AuthenticationCreds, AuthenticationState, BufferJSON, initAuthCreds, proto, SignalDataTypeMap } from 'baileys';
 import { isNotEmpty } from 'class-validator';
+
+import { ProviderFiles } from '../api/provider/sessions';
+import { Logger } from '../config/logger.config';
 
 export type AuthState = { state: AuthenticationState; saveCreds: () => Promise<void> };
 
 export class AuthStateProvider {
   constructor(private readonly providerFiles: ProviderFiles) {}
 
-  private readonly logger = new Logger('AuthStateProvider');
+  private readonly logger = new Logger(AuthStateProvider.name);
 
   public async authStateProvider(instance: string): Promise<AuthState> {
     const [, error] = await this.providerFiles.create(instance);

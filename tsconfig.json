@@ -3,8 +3,8 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": true,
-    "target": "es2020",
-    "module": "CommonJS",
+    "target": "ES6",
+    "module": "commonjs",
     "rootDir": "./",
     "resolveJsonModule": true,
     "removeComments": true,
@@ -16,18 +16,7 @@
     "skipLibCheck": true,
     "strictNullChecks": false,
     "incremental": true,
-    "noImplicitAny": false,
-    "baseUrl": ".",
-    "paths": {
-      "@api/*": ["./src/api/*"],
-      "@cache/*": ["./src/cache/*"],
-      "@config/*": ["./src/config/*"],
-      "@exceptions": ["./src/exceptions"],
-      "@libs/*": ["./src/libs/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@validate/*": ["./src/validate/*"]
-    },
-    "moduleResolution": "Node"
+    "noImplicitAny": false
   },
   "exclude": ["node_modules", "./test", "./dist", "./prisma"],
   "include": [
